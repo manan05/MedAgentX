@@ -1,5 +1,5 @@
 from langchain_core.prompts import PromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 
 class Agent:
     def __init__(self, medical_report=None, role=None, extra_info=None):
@@ -9,12 +9,14 @@ class Agent:
         # Initialize the prompt based on role and other info
         self.prompt_template = self.create_prompt_template()
         # Initialize the model
-        print("Here")
-        self.model = ChatOpenAI(temperature=0, model="gpt-4o")
+        self.model = ChatGroq(
+            model_name="llama3-70b-8192",
+            temperature=0
+        )
 
     def create_prompt_template(self):
         if self.role == "MultidisciplinaryTeam":
-            templates = f"""
+            template = f"""
                 Act like a multidisciplinary team of healthcare professionals.
                 You will receive a medical report of a patient visited by a Cardiologist, Psychologist, and Pulmonologist.
                 Task: Review the patient's medical report from the Cardiologist, Psychologist, and Pulmonologist, analyze them and come up with a list of 3 possible health issues of the patient.
@@ -51,8 +53,8 @@ class Agent:
                     Patient's Report: {medical_report}
                 """
             }
-        templates = templates[self.role]
-        return PromptTemplate.from_template(templates)
+            template = templates[self.role]
+        return PromptTemplate.from_template(template)
     
     def run(self):
         print(f"{self.role} is running...")
