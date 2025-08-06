@@ -57,14 +57,22 @@ class Agent:
         return PromptTemplate.from_template(template)
     
     def run(self):
-        print(f"{self.role} is running...")
-        prompt = self.prompt_template.format(medical_report=self.medical_report)
+        if self.role == "MultidisciplinaryTeam":
+            prompt = self.prompt_template.format(
+                cardiologist_report=self.extra_info.get('cardiologist_report', ''),
+                psychologist_report=self.extra_info.get('psychologist_report', ''),
+                pulmonologist_report=self.extra_info.get('pulmonologist_report', '')
+            )
+        else:
+            prompt = self.prompt_template.format(medical_report=self.medical_report)
+        
         try:
             response = self.model.invoke(prompt)
             return response.content
         except Exception as e:
-            print("Error occurred:", e)
-            return None
+            print(f"Error running agent ({self.role}):", e)
+            return "Error"
+
 
 # Define specialized agent classes
 class Cardiologist(Agent):
