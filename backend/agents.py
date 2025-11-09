@@ -10,46 +10,42 @@ class Agent:
         self.prompt_template = self.create_prompt_template()
         # Initialize the model
         self.model = ChatGroq(
-            model_name="llama3-70b-8192",
-            temperature=0
+            model_name="llama-3.1-8b-instant",
+            temperature=1
         )
 
     def create_prompt_template(self):
         if self.role == "MultidisciplinaryTeam":
             template = f"""
-                Act like a multidisciplinary team of healthcare professionals.
-                You will receive a medical report of a patient visited by a Cardiologist, Psychologist, and Pulmonologist.
-                Task: Review the patient's medical report from the Cardiologist, Psychologist, and Pulmonologist, analyze them and come up with a list of 3 possible health issues of the patient.
-                Just return a list of bullet points of 3 possible health issues of the patient and for each issue provide the reason.
-                
-                Cardiologist Report: {self.extra_info.get('cardiologist_report', '')}
-                Psychologist Report: {self.extra_info.get('psychologist_report', '')}
-                Pulmonologist Report: {self.extra_info.get('pulmonologist_report', '')}
-            """
+            Act as a multidisciplinary medical team (Cardiologist, Psychologist, Pulmonologist). Review the three reports below and summarize in under 120 words.  Return only three bullet points, each describing:  
+• A possible health issue  
+• One brief reason based on the reports  
+
+Cardiologist Report: {self.extra_info.get('cardiologist_report', '')}
+Psychologist Report: {self.extra_info.get('psychologist_report', '')}
+Pulmonologist Report: {self.extra_info.get('pulmonologist_report', '')}
+"""
         else:
             templates = {
                 "Cardiologist": """
-                    Act like a cardiologist. You will receive a medical report of a patient.
-                    Task: Review the patient's cardiac workup, including ECG, blood tests, Holter monitor results, and echocardiogram.
-                    Focus: Determine if there are any subtle signs of cardiac issues that could explain the patient’s symptoms. Rule out any underlying heart conditions, such as arrhythmias or structural abnormalities, that might be missed on routine testing.
-                    Recommendation: Provide guidance on any further cardiac testing or monitoring needed to ensure there are no hidden heart-related concerns. Suggest potential management strategies if a cardiac issue is identified.
-                    Please only return the possible causes of the patient's symptoms and the recommended next steps.
+                    Act as a cardiologist. Review the patient's medical report and identify possible cardiac causes of symptoms. Respond briefly using bullet points with:  
+                    • 2–3 possible causes  
+                    • 2–3 recommended next steps  
+                    Avoid long explanations or extra context.  
                     Medical Report: {medical_report}
                 """,
                 "Psychologist": """
-                    Act like a psychologist. You will receive a patient's report.
-                    Task: Review the patient's report and provide a psychological assessment.
-                    Focus: Identify any potential mental health issues, such as anxiety, depression, or trauma, that may be affecting the patient's well-being.
-                    Recommendation: Offer guidance on how to address these mental health concerns, including therapy, counseling, or other interventions.
-                    Please only return the possible mental health issues and the recommended next steps.
+                    Act as a psychologist. Review the patient's report and identify likely mental health factors affecting well-being. Respond concisely with bullet points for:  
+                    • 2–3 possible psychological issues  
+                    • 2–3 recommended next steps  
+                    Keep it short and factual.  
                     Patient's Report: {medical_report}
                 """,
                 "Pulmonologist": """
-                    Act like a pulmonologist. You will receive a patient's report.
-                    Task: Review the patient's report and provide a pulmonary assessment.
-                    Focus: Identify any potential respiratory issues, such as asthma, COPD, or lung infections, that may be affecting the patient's breathing.
-                    Recommendation: Offer guidance on how to address these respiratory concerns, including pulmonary function tests, imaging studies, or other interventions.
-                    Please only return the possible respiratory issues and the recommended next steps.
+                    Act as a pulmonologist. Review the patient's report and summarize likely respiratory concerns. Respond in bullet points with:  
+                    • 2–3 possible respiratory issues  
+                    • 2–3 next steps  
+                    Keep total length under 100 words.  
                     Patient's Report: {medical_report}
                 """
             }

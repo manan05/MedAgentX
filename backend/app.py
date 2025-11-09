@@ -35,11 +35,11 @@ def analyze_report():
         final_summary = mdt_agent.run()
 
         # Save to backend/result/ folder
-        timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-        output_file = f"result/summary-{timestamp}.txt"
-        os.makedirs(os.path.dirname(output_file), exist_ok=True)
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(final_summary)
+        # timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+        # output_file = f"result/summary-{timestamp}.txt"
+        # os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        # with open(output_file, 'w', encoding='utf-8') as f:
+        #     f.write(final_summary)
 
         return jsonify({
             "cardiologist": cardiologist_result,
