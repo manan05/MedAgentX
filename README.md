@@ -10,6 +10,8 @@ Using **LangChain**, **Groq's LLaMA-3-70B**, and concurrent processing, it revie
 
 This is a full-stack web app with a **Flask** backend and **React + Tailwind CSS** frontend.
 
+**CHECKOUT Link:** ![MedAgentX](https://med-agent-x.vercel.app/) 
+
 ---
 
 ## 🚀 Features
@@ -108,5 +110,3 @@ http://localhost:5173
 - **Add PDF export of final report**
 
 - **Add file history & user accounts**
-
-- **Deploy backend and frontend together (e.g. with Railway + Vercel)**
