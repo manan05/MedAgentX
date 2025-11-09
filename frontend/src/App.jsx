@@ -28,7 +28,7 @@ export default function App() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/analyze", {
+      const res = await fetch("https://medagentx.onrender.com/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ report: reportText }),
