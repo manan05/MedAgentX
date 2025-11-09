@@ -2,7 +2,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from Utils.Agents import Cardiologist, Psychologist, Pulmonologist, MultidisciplinaryTeam
+from agents import Cardiologist, Psychologist, Pulmonologist, MultidisciplinaryTeam
 from dotenv import load_dotenv
 import json, os
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
