@@ -1,7 +1,22 @@
 import { useState } from "react";
 import { marked } from "marked";
+import {
+  Box,
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  CircularProgress,
+  Alert,
+  Paper,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import MedicalInformationIcon from "@mui/icons-material/MedicalInformation";
 
-function App() {
+export default function App() {
   const [reportText, setReportText] = useState("");
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -20,11 +35,7 @@ function App() {
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Server error");
-      }
-
+      if (!res.ok) throw new Error(data.error || "Server error");
       setResults(data);
     } catch (err) {
       setError(err.message || "Something went wrong.");
@@ -34,76 +45,122 @@ function App() {
   };
 
   return (
-    <div style={{ margin: '20px'}} className="min-h-screen bg-gradient-to-b from-blue-50 to-white px-4 py-8 flex flex-col items-center font-sans margin">
-      <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-8">
-        <h1 className="text-3xl font-bold text-blue-800 mb-6">
-          🩺 MedAgentX Report Analyzer
-        </h1>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        bgcolor: "background.default",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        p: 2,
+      }}
+    >
+      <Container maxWidth="md">
+        <Paper elevation={4} sx={{ p: 5, borderRadius: 3 }}>
+          <Box display="flex" alignItems="center" gap={1} mb={3}>
+            <MedicalInformationIcon color="primary" fontSize="large" />
+            <Typography variant="h4" fontWeight={600}>
+              MedAgentX Report Analyzer
+            </Typography>
+          </Box>
 
-        <textarea
-          value={reportText}
-          onChange={(e) => setReportText(e.target.value)}
-          placeholder="Paste a medical report here..."
-          className="w-full max-w-3xl h-40 p-4 border border-gray-300 rounded-lg resize-none mb-4 focus:outline-none focus:ring-2 focus:ring-blue-300"
-        />
+          <TextField
+            multiline
+            minRows={6}
+            maxRows={15}
+            value={reportText}
+            onChange={(e) => setReportText(e.target.value)}
+            fullWidth
+            placeholder="Paste a medical report here..."
+            variant="outlined"
+            sx={{ mb: 3 }}
+          />
 
-        <div className="flex justify-center">
-          <button
-            onClick={handleSubmit}
-            disabled={loading || !reportText.trim()}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded transition disabled:opacity-50"
-          >
-            {loading ? "Analyzing..." : "Analyze Report"}
-          </button>
-        </div>
+          <Box display="flex" justifyContent="center" mb={3}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              onClick={handleSubmit}
+              disabled={loading || !reportText.trim()}
+              sx={{ textTransform: "none", px: 5, py: 1.2 }}
+            >
+              {loading ? (
+                <>
+                  <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
+                  Analyzing...
+                </>
+              ) : (
+                "Analyze Report"
+              )}
+            </Button>
+          </Box>
 
-        {error && (
-          <p className="text-red-600 text-center mt-4 font-medium">{error}</p>
-        )}
+          {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
-        <div className="mt-8 space-y-6">
           {!results && !loading && (
-            <div className="text-gray-500 text-center italic">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              align="center"
+              sx={{ mt: 4, fontStyle: "italic" }}
+            >
               Results will appear here once analysis is complete.
-            </div>
+            </Typography>
           )}
 
           {results && (
-            <>
-              <ReportSection
+            <Box mt={4}>
+              <ReportAccordion
                 title="🫀 Cardiologist's Report"
                 markdown={results.cardiologist}
               />
-              <ReportSection
+              <ReportAccordion
                 title="🧠 Psychologist's Report"
                 markdown={results.psychologist}
               />
-              <ReportSection
+              <ReportAccordion
                 title="🫁 Pulmonologist's Report"
                 markdown={results.pulmonologist}
               />
-              <ReportSection
+              <ReportAccordion
                 title="🧾 Final MDT Summary"
                 markdown={results.summary}
               />
-            </>
+            </Box>
           )}
-        </div>
-      </div>
-    </div>
+        </Paper>
+      </Container>
+    </Box>
   );
 }
 
-function ReportSection({ title, markdown }) {
+function ReportAccordion({ title, markdown }) {
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 shadow-sm">
-      <h2 className="text-xl font-semibold text-gray-800 mb-3">{title}</h2>
-      <div
-        className="prose prose-blue max-w-none"
-        dangerouslySetInnerHTML={{ __html: marked.parse(markdown || "") }}
-      />
-    </div>
+    <Accordion sx={{ mb: 2, borderRadius: 2, "&:before": { display: "none" } }}>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        sx={{
+          bgcolor: "grey.100",
+          "&:hover": { bgcolor: "grey.200" },
+          borderRadius: 2,
+        }}
+      >
+        <Typography variant="subtitle1" fontWeight={600}>
+          {title}
+        </Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Box
+          sx={{
+            typography: "body1",
+            color: "text.primary",
+            "& ul": { pl: 3 },
+            "& strong": { color: "primary.main" },
+          }}
+          dangerouslySetInnerHTML={{ __html: marked.parse(markdown || "") }}
+        />
+      </AccordionDetails>
+    </Accordion>
   );
 }
-
-export default App;

@@ -17,10 +17,11 @@ class Agent:
     def create_prompt_template(self):
         if self.role == "MultidisciplinaryTeam":
             template = f"""
-            Act as a multidisciplinary medical team (Cardiologist, Psychologist, Pulmonologist). Review the three reports below and summarize in under 120 words.  Return only three bullet points, each describing:  
-• A possible health issue  
-• One brief reason based on the reports  
-
+            Act as a multidisciplinary medical team (Cardiologist, Psychologist, Pulmonologist). Review the three reports below and summarize in under 120 words.  
+            Return only three bullet points, each describing:  
+                • A possible health issue  
+                • One brief reason based on the reports  
+Give response in perfect markdown
 Cardiologist Report: {self.extra_info.get('cardiologist_report', '')}
 Psychologist Report: {self.extra_info.get('psychologist_report', '')}
 Pulmonologist Report: {self.extra_info.get('pulmonologist_report', '')}
@@ -31,21 +32,27 @@ Pulmonologist Report: {self.extra_info.get('pulmonologist_report', '')}
                     Act as a cardiologist. Review the patient's medical report and identify possible cardiac causes of symptoms. Respond briefly using bullet points with:  
                     • 2–3 possible causes  
                     • 2–3 recommended next steps  
-                    Avoid long explanations or extra context.  
+                    Keep total length under 50 words. 
+                    Start the response as: Cardiac concerns for Name 
+                    Give response in perfect markdown
                     Medical Report: {medical_report}
                 """,
                 "Psychologist": """
                     Act as a psychologist. Review the patient's report and identify likely mental health factors affecting well-being. Respond concisely with bullet points for:  
                     • 2–3 possible psychological issues  
                     • 2–3 recommended next steps  
-                    Keep it short and factual.  
+                    Start the response as: Psychological concerns for Name
+                    Keep total length under 50 words. 
+                    Give response in perfect markdown
                     Patient's Report: {medical_report}
                 """,
                 "Pulmonologist": """
                     Act as a pulmonologist. Review the patient's report and summarize likely respiratory concerns. Respond in bullet points with:  
                     • 2–3 possible respiratory issues  
                     • 2–3 next steps  
-                    Keep total length under 100 words.  
+                    Keep total length under 50 words.
+                    Start the response as: Respiration concerns for Name
+                    Give response in perfect markdown
                     Patient's Report: {medical_report}
                 """
             }
