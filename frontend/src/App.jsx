@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { marked } from "marked";
+import { Analytics } from '@vercel/analytics/react';
 import {
   Box,
   Container,
@@ -23,7 +24,7 @@ export default function App() {
   const [error, setError] = useState("");
   const [validationError, setValidationError] = useState("");
 
-  const local_URL = "http://localhost:5000/analyze";
+  // const local_URL = "http://localhost:5000/analyze";
   const prod_URL = "https://medagentx.onrender.com/analyze";
 
   const validateReport = (text) => {
@@ -191,6 +192,7 @@ export default function App() {
             </Box>
           )}
         </Paper>
+        <Analytics />
       </Container>
     </Box>
   );
