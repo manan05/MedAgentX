@@ -59,7 +59,32 @@ Pulmonologist Report: {self.extra_info.get('pulmonologist_report', '')}
             template = templates[self.role]
         return PromptTemplate.from_template(template)
     
+
+    @staticmethod
+    def is_medical_report(text):
+        if not text or len(text.strip()) < 40:
+            return False
+
+        text_lower = text.lower()
+        # common tokens that show medical content
+        keywords = [
+            "bp", "blood pressure", "heart", "ecg", "ekg", "ejection fraction",
+            "fev1", "spo2", "oxygen", "ct", "mri", "echo", "ecg", "arrhythmia",
+            "syncope", "palpitation", "chest pain", "dyspnea", "shortness of breath",
+            "fever", "anticoag", "warfarin", "heparin", "aspirin", "ldl", "troponin",
+            "fracture", "aneurysm", "pulmonary", "asthma", "copd", "ptsd", "depression",
+            "anxiety", "diagnosis", "impression", "history", "examination", "admitted",
+            "discharge", "vitals", "systolic", "diastolic", "wbc", "hemoglobin"
+        ]
+        found = sum(1 for kw in keywords if kw in text_lower)
+
+        # heuristic threshold: at least 2 medical tokens
+        return found >= 2
+    
     def run(self):
+        if not self.is_medical_report(self.medical_report or self.extra_info.get('cardiologist_report', '') or ''):
+            return "INVALID_REPORT: Input does not appear to be a medical report."
+        
         if self.role == "MultidisciplinaryTeam":
             prompt = self.prompt_template.format(
                 cardiologist_report=self.extra_info.get('cardiologist_report', ''),

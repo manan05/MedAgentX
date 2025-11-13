@@ -21,14 +21,72 @@ export default function App() {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [validationError, setValidationError] = useState("");
+
+  const local_URL = "http://localhost:5000/analyze";
+  const prod_URL = "https://medagentx.onrender.com/analyze";
+
+  const validateReport = (text) => {
+    if (!text || text.trim().length < 40)
+      return "The report seems too short to analyze.";
+    const medicalKeywords = [
+      "heart",
+      "bp",
+      "blood pressure",
+      "oxygen",
+      "respiratory",
+      "lungs",
+      "fever",
+      "asthma",
+      "cardiac",
+      "anxiety",
+      "depression",
+      "pulmonary",
+      "diagnosis",
+      "treatment",
+      "symptom",
+      "patient",
+      "pulse",
+      "vitals",
+      "breathing",
+      "mri",
+      "ct",
+      "x-ray",
+    ];
+    const found = medicalKeywords.filter((k) =>
+      text.toLowerCase().includes(k)
+    ).length;
+    if (found < 2)
+      return "The input doesn't appear to be a medical report. Please include relevant details (symptoms, vitals, or findings).";
+    return "";
+  };
+
+  const handleChange = (e) => {
+    const newText = e.target.value;
+    setReportText(newText);
+
+    // live revalidation: remove error if the new text is valid
+    if (validationError) {
+      const msg = validateReport(newText);
+      if (!msg) setValidationError("");
+      else setValidationError(msg);
+    }
+  };
 
   const handleSubmit = async () => {
+    const validationMsg = validateReport(reportText);
+    if (validationMsg) {
+      setValidationError(validationMsg);
+      return;
+    }
+
+    setValidationError("");
     setLoading(true);
     setResults(null);
     setError("");
 
     try {
-      const res = await fetch("https://medagentx.onrender.com/analyze", {
+      const res = await fetch(prod_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ report: reportText }),
@@ -37,6 +95,7 @@ export default function App() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Server error");
       setResults(data);
+      setValidationError("");
     } catch (err) {
       setError(err.message || "Something went wrong.");
     } finally {
@@ -69,11 +128,13 @@ export default function App() {
             minRows={6}
             maxRows={15}
             value={reportText}
-            onChange={(e) => setReportText(e.target.value)}
+            onChange={handleChange}
             fullWidth
             placeholder="Paste a medical report here..."
             variant="outlined"
-            sx={{ mb: 3 }}
+            sx={{ mb: 2 }}
+            error={!!validationError}
+            helperText={validationError || ""}
           />
 
           <Box display="flex" justifyContent="center" mb={3}>
@@ -82,7 +143,7 @@ export default function App() {
               color="primary"
               size="large"
               onClick={handleSubmit}
-              disabled={loading || !reportText.trim()}
+              disabled={loading || !reportText.trim() || !!validationError}
               sx={{ textTransform: "none", px: 5, py: 1.2 }}
             >
               {loading ? (
